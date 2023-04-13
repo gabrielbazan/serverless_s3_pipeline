@@ -1,0 +1,120 @@
+service: thumbnails-service
+
+
+plugins:
+  - serverless-localstack
+  - serverless-python-requirements
+
+
+custom:
+  localstack:
+    stages:
+      - local
+    debug: false
+
+  pythonRequirements:
+    dockerizePip: false
+    useDownloadCache: true
+    useStaticCache: true
+    slim: true
+
+
+package:
+  individually: true
+  patterns:
+    - "!test"
+    - "!functions/__pycache__"
+    - "!node_modules"
+    - "!venv"
+    - "!.mypy_cache"
+    - "!.idea"
+    - "!.vscode"
+    - "!.pre-commit-config.yaml"
+    - "!package-lock.json"
+    - "!tox.ini"
+    - "!Makefile"
+
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: us-east-1
+
+  environment:
+    THUMBNAILS_BUCKET_NAME: thumbnails-bucket
+
+
+functions:
+  generate_thumbnails:
+    handler: functions/generate_thumbnails.handler
+    events:
+      - s3:
+          bucket: images-bucket
+          event: s3:ObjectCreated:*
+          rules:
+            - suffix: .png
+      - s3:
+          bucket: images-bucket
+          event: s3:ObjectCreated:*
+          rules:
+            - suffix: .jpg
+
+
+resources:
+  Resources:
+    ImagesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: images-bucket
+
+    ThumbnailsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.THUMBNAILS_BUCKET_NAME}
+
+    ImagesBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: images-bucket
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Sid: AllowLambdaToReadObjects
+              Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+              Action: s3:GetObject
+              Resource: arn:aws:s3:::images-bucket/*
+
+    GenerateThumbnailsLambdaExecutionRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+        RoleName: "GenerateThumbnailsLambdaExecutionRole"
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service: "lambda.amazonaws.com"
+              Action: "sts:AssumeRole"
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies:
+          - PolicyName: "s3Access"
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: "Allow"
+                  Action:
+                    - "s3:GetObject"
+                  Resource: 
+                    - "arn:aws:s3:::images-bucket/*"
+          - PolicyName: "s3Access"
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: "Allow"
+                  Action:
+                    - "s3:PutObject"
+                  Resource: 
+                    - "arn:aws:s3:::${self:provider.environment.THUMBNAILS_BUCKET_NAME}/*"
