@@ -1,3 +1,4 @@
+import json
 from collections import namedtuple
 from os.path import basename, dirname, join, splitext
 from tempfile import TemporaryDirectory
@@ -25,15 +26,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
 def get_files_from_event(event: Dict[str, Any]) -> Generator[RemoteFile, None, None]:
     for record in event["Records"]:
-        s3 = record["s3"]
+        body = record["body"]
+        body_json = json.loads(body)
 
-        bucket = s3["bucket"]
-        bucket_name = bucket["name"]
+        body_records = body_json["Records"]
 
-        obj = s3["object"]
-        file_path = obj["key"]
+        for body_record in body_records:
+            s3 = body_record["s3"]
 
-        yield RemoteFile(bucket_name, file_path)
+            bucket_name = s3["bucket"]["name"]
+            file_path = s3["object"]["key"]
+
+            yield RemoteFile(bucket_name, file_path)
 
 
 def process_file(remote_file: RemoteFile) -> None:

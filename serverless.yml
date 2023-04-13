@@ -41,23 +41,17 @@ provider:
   region: us-east-1
 
   environment:
+    IMAGES_BUCKET_NAME: images-bucket
     THUMBNAILS_BUCKET_NAME: thumbnails-bucket
+    IMAGES_QUEUE_NAME: images-queue
 
 
 functions:
   generate_thumbnails:
     handler: functions/generate_thumbnails.handler
     events:
-      - s3:
-          bucket: images-bucket
-          event: s3:ObjectCreated:*
-          rules:
-            - suffix: .png
-      - s3:
-          bucket: images-bucket
-          event: s3:ObjectCreated:*
-          rules:
-            - suffix: .jpg
+      - sqs:
+          arn: !GetAtt ImagesQueue.Arn
 
 
 resources:
@@ -65,26 +59,51 @@ resources:
     ImagesBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: images-bucket
+        BucketName: ${self:provider.environment.IMAGES_BUCKET_NAME}
+        NotificationConfiguration:
+          QueueConfigurations:
+            - Event: 's3:ObjectCreated:Put'
+              Filter:
+                S3Key:
+                  Rules:
+                    - Name: suffix
+                      Value: .png
+              Queue: !GetAtt ImagesQueue.Arn
+            - Event: 's3:ObjectCreated:Put'
+              Filter:
+                S3Key:
+                  Rules:
+                    - Name: suffix
+                      Value: .jpg
+              Queue: !GetAtt ImagesQueue.Arn
+
+    ImagesQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:provider.environment.IMAGES_QUEUE_NAME}
 
     ThumbnailsBucket:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:provider.environment.THUMBNAILS_BUCKET_NAME}
 
-    ImagesBucketPolicy:
-      Type: AWS::S3::BucketPolicy
+    ImagesQueuePolicy:
+      Type: "AWS::SQS::QueuePolicy"
       Properties:
-        Bucket: images-bucket
         PolicyDocument:
-          Version: '2012-10-17'
+          Version: "2012-10-17"
           Statement:
-            - Sid: AllowLambdaToReadObjects
-              Effect: Allow
+            - Effect: "Allow"
               Principal:
-                Service: lambda.amazonaws.com
-              Action: s3:GetObject
-              Resource: arn:aws:s3:::images-bucket/*
+                Service: "s3.amazonaws.com"
+              Action: "sqs:SendMessage"
+              Resource:
+                Ref: "ImagesQueue"
+              Condition:
+                ArnLike:
+                  aws:SourceArn: !Sub "arn:aws:s3:::${self:provider.environment.IMAGES_BUCKET_NAME}/*"
+        Queues:
+          - !Ref ImagesQueue
 
     GenerateThumbnailsLambdaExecutionRole:
       Type: "AWS::IAM::Role"
@@ -108,7 +127,7 @@ resources:
                   Action:
                     - "s3:GetObject"
                   Resource: 
-                    - "arn:aws:s3:::images-bucket/*"
+                    - "arn:aws:s3:::${self:provider.environment.IMAGES_BUCKET_NAME}/*"
           - PolicyName: "s3Access"
             PolicyDocument:
               Version: "2012-10-17"
