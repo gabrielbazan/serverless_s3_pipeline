@@ -1,24 +1,17 @@
-from typing import Any, Dict, Tuple, List
 from collections import namedtuple
-import boto3
-from os.path import basename, join, dirname, splitext
-from os import environ
+from os.path import basename, dirname, join, splitext
 from tempfile import TemporaryDirectory
+from typing import Any, Dict, Generator, List, Tuple
+
 from PIL import Image
 
-
-THUMBNAIL_SIZES = (
-    (75, 75),
-    (125, 125),
-    (1280, 720),
+from functions.aws import download_file_from_s3_bucket, upload_file_to_s3_bucket
+from functions.environment import EnvironmentVariable, get_environment_variable_or_raise
+from functions.settings import (
+    THUMBNAIL_SIZES,
+    THUMBNAILS_BUCKET_FILE_FOLDER_NAME_TEMPLATE,
+    THUMBNAILS_BUCKET_FOLDER_PATH,
 )
-
-
-AWS_ENDPOINT_URL = environ["AWS_ENDPOINT_URL"]
-THUMBNAILS_BUCKET_NAME = environ["THUMBNAILS_BUCKET_NAME"]
-
-THUMBNAILS_BUCKET_FOLDER_PATH = "thumbnails"
-
 
 RemoteFile = namedtuple("RemoteFile", ["bucket_name", "file_path"])
 
@@ -30,7 +23,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     return {"body": "Success", "statusCode": 200}
 
 
-def get_files_from_event(event):
+def get_files_from_event(event: Dict[str, Any]) -> Generator[RemoteFile, None, None]:
     for record in event["Records"]:
         s3 = record["s3"]
 
@@ -54,9 +47,7 @@ def download_file(remote_file: RemoteFile, folder_path: str) -> str:
     filename = basename(remote_file.file_path)
     local_file_path = join(folder_path, filename)
 
-    client = boto3.client("s3", endpoint_url=AWS_ENDPOINT_URL)
-
-    client.download_file(
+    download_file_from_s3_bucket(
         remote_file.bucket_name,
         remote_file.file_path,
         local_file_path,
@@ -115,7 +106,8 @@ def upload_thumbnail(
 ) -> None:
     file_name = basename(remote_file.file_path)
 
-    remote_thumbnails_folder_name = f"thumbnails_{file_name}"
+    template = THUMBNAILS_BUCKET_FILE_FOLDER_NAME_TEMPLATE
+    remote_thumbnails_folder_name = template.format(file_name)
 
     thumbnail_filename = basename(local_thumbnail_path)
 
@@ -125,11 +117,12 @@ def upload_thumbnail(
         thumbnail_filename,
     )
 
-    client = boto3.client("s3", endpoint_url=AWS_ENDPOINT_URL)
-    client.upload_file(
-        local_thumbnail_path,
-        THUMBNAILS_BUCKET_NAME,
-        remote_thumbnail_path,
+    thumbnails_bucket_name = get_environment_variable_or_raise(
+        EnvironmentVariable.THUMBNAILS_BUCKET_NAME
     )
 
-    print("Uploaded to ", remote_thumbnail_path)
+    upload_file_to_s3_bucket(
+        local_thumbnail_path,
+        thumbnails_bucket_name,
+        remote_thumbnail_path,
+    )
