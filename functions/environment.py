@@ -2,8 +2,9 @@ from os import environ
 
 
 class EnvironmentVariable:
-    AWS_ENDPOINT_URL = "AWS_ENDPOINT_URL"
-    THUMBNAILS_BUCKET_NAME = "THUMBNAILS_BUCKET_NAME"
+    AWS_ENDPOINT_URL: str = "AWS_ENDPOINT_URL"
+    THUMBNAILS_BUCKET_NAME: str = "THUMBNAILS_BUCKET_NAME"
+    IMAGES_DLQ_URL: str = "IMAGES_DLQ_URL"
 
 
 def get_environment_variable_or_raise(name: str) -> str:

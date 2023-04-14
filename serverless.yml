@@ -44,6 +44,8 @@ provider:
     IMAGES_BUCKET_NAME: images-bucket
     THUMBNAILS_BUCKET_NAME: thumbnails-bucket
     IMAGES_QUEUE_NAME: images-queue
+    IMAGES_DLQ_NAME: images-dlq
+    IMAGES_DLQ_URL: { Ref: ImagesDLQ }
 
 
 functions:
@@ -52,6 +54,8 @@ functions:
     events:
       - sqs:
           arn: !GetAtt ImagesQueue.Arn
+          batchSize: 10
+          functionResponseType: ReportBatchItemFailures
 
 
 resources:
@@ -81,6 +85,15 @@ resources:
       Type: "AWS::SQS::Queue"
       Properties:
         QueueName: ${self:provider.environment.IMAGES_QUEUE_NAME}
+        RedrivePolicy:
+          deadLetterTargetArn:
+            Fn::GetAtt: [ImagesDLQ, Arn]
+          maxReceiveCount: 3
+
+    ImagesDLQ:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:provider.environment.IMAGES_DLQ_NAME}
 
     ThumbnailsBucket:
       Type: AWS::S3::Bucket

@@ -1,8 +1,9 @@
 import json
+import logging
 from collections import namedtuple
 from os.path import basename, dirname, join, splitext
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Generator, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from PIL import Image
 
@@ -14,18 +15,24 @@ from functions.settings import (
     THUMBNAILS_BUCKET_FOLDER_PATH,
 )
 
-RemoteFile = namedtuple("RemoteFile", ["bucket_name", "file_path"])
+logging.basicConfig()
+logging.getLogger().setLevel(logging.INFO)
+
+RemoteFile = namedtuple("RemoteFile", ["bucket_name", "file_path", "message_id"])
 
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
-    for remote_file in get_files_from_event(event):
-        process_file(remote_file)
+    remote_files: List[RemoteFile] = get_files_from_event(event)
+    failed_files: List[RemoteFile] = process_files(remote_files)
+    return build_response(failed_files)
 
-    return {"body": "Success", "statusCode": 200}
 
+def get_files_from_event(event: Dict[str, Any]) -> List[RemoteFile]:
+    remote_files = []
 
-def get_files_from_event(event: Dict[str, Any]) -> Generator[RemoteFile, None, None]:
     for record in event["Records"]:
+        message_id = record["messageId"]
+
         body = record["body"]
         body_json = json.loads(body)
 
@@ -37,7 +44,40 @@ def get_files_from_event(event: Dict[str, Any]) -> Generator[RemoteFile, None, N
             bucket_name = s3["bucket"]["name"]
             file_path = s3["object"]["key"]
 
-            yield RemoteFile(bucket_name, file_path)
+            remote_files.append(RemoteFile(bucket_name, file_path, message_id))
+
+    return remote_files
+
+
+def process_files(remote_files: List[RemoteFile]) -> List[RemoteFile]:
+    failed_files: List[RemoteFile] = []
+
+    for remote_file in remote_files:
+        try_to_process_file(remote_file, failed_files)
+
+    return failed_files
+
+
+def build_response(failed_files: List[RemoteFile]) -> Dict[str, List[Dict[str, str]]]:
+    return {
+        "batchItemFailures": [
+            {
+                "itemIdentifier": failed_file.message_id,
+            }
+            for failed_file in failed_files
+        ]
+    }
+
+
+def try_to_process_file(
+    remote_file: RemoteFile, failed_files: List[RemoteFile]
+) -> None:
+    try:
+        process_file(remote_file)
+        logging.info("Successfully processed %s", remote_file)
+    except Exception:
+        logging.error("Failed to process %s", remote_file)
+        failed_files.append(remote_file)
 
 
 def process_file(remote_file: RemoteFile) -> None:
