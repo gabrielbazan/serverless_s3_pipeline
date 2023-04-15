@@ -33,3 +33,89 @@ It also includes:
         1. The message is retried as many times as configured in the queue
         2. If it continues to fail, the message is sent to a DLQ
         3. You can manually invoke another lambda function that dequeues from the DLQ and sends the messages back to the original queue to be retried
+
+
+## Structure
+
+The [serverless.yml](/serverless.yml) file contains the Serverless configuration to deploy the stack to either AWS or LocalStack.
+
+The lambda functions are located in the [functions](/functions) package. Each AWS Lambda handler function is on a separate file. Common code is in the same package.
+
+Unit tests are in the [functions/tests](/functions/tests) package.
+
+Integration tests are in the [integration_tests](/integration_tests) package.
+
+You can find useful commands in the [Makefile](/Makefile).
+
+Python requirements:
+  1. The *requirements.txt* file contains the essential Python dependencies required by the application logic to run.
+  2. The *requirements.dev.txt* file contains the Python dependencies you need to have installed in your environment to contribute to the application logic.
+  3. The *requirements.test.txt* file contains the Python dependencies required to run tests.
+
+
+## Setup
+
+### Install the Serverless Framework
+```bash
+npm install -g serverless
+```
+
+### Install LocalStack:
+```bash
+pip install localstack
+```
+
+### Install Serverless Framework Plugins
+
+Go to the root directory of this repo and install the plugins:
+```bash
+cd serverless_s3_pipeline
+
+npm i
+```
+
+### Install and Configure the AWS CLI
+
+Follow [these instructions](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) to install the AWS CLI.
+
+To interact with LocalStack through the AWS CLI, you can create a profile with dummy region and access key.
+
+Add this to your `~/.aws/config` file:
+```
+[profile localstack]
+region = us-east-1
+output = json
+```
+
+And this to your `~/.aws/credentials` file:
+```
+[localstack]
+aws_access_key_id = dummyaccesskey
+aws_secret_access_key = dummysecretaccesskey
+```
+
+## Deploy to LocalStack
+
+Start LocalStack:
+```bash
+localstack start
+```
+
+Deploy to LocalStack:
+```bash
+serverless deploy --stage local
+```
+
+You should get something like the following. Notice the endpoint URL:
+```
+✔ Service deployed to stack thumbnails-service-local
+
+functions:
+  generate_thumbnails: thumbnails-service-local-generate_thumbnails
+  retry_from_dlq: thumbnails-service-local-retry_from_dlq
+```
+
+You can alternatively start localstack as a daemon and deploy with a single command:
+```bash
+make deploy_local
+```
