@@ -4,6 +4,7 @@ from os import environ
 class EnvironmentVariable:
     AWS_ENDPOINT_URL: str = "AWS_ENDPOINT_URL"
     THUMBNAILS_BUCKET_NAME: str = "THUMBNAILS_BUCKET_NAME"
+    IMAGES_QUEUE_URL: str = "IMAGES_QUEUE_URL"
     IMAGES_DLQ_URL: str = "IMAGES_DLQ_URL"
 
 

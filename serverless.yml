@@ -44,10 +44,12 @@ provider:
     IMAGES_BUCKET_NAME: images-bucket
     THUMBNAILS_BUCKET_NAME: thumbnails-bucket
     IMAGES_QUEUE_NAME: images-queue
+    IMAGES_QUEUE_URL: { Ref: ImagesQueue }
     IMAGES_DLQ_NAME: images-dlq
     IMAGES_DLQ_URL: { Ref: ImagesDLQ }
 
 
+# TODO: Per-function requirements
 functions:
   generate_thumbnails:
     handler: functions/generate_thumbnails.handler
@@ -56,6 +58,10 @@ functions:
           arn: !GetAtt ImagesQueue.Arn
           batchSize: 10
           functionResponseType: ReportBatchItemFailures
+  
+  retry_from_dlq:
+    handler: functions/retry_from_dlq.handler
+    timeout: 300
 
 
 resources:
@@ -88,7 +94,7 @@ resources:
         RedrivePolicy:
           deadLetterTargetArn:
             Fn::GetAtt: [ImagesDLQ, Arn]
-          maxReceiveCount: 3
+          maxReceiveCount: 2
 
     ImagesDLQ:
       Type: AWS::SQS::Queue

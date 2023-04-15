@@ -7,7 +7,13 @@ TEST_REQUIREMENTS_FILE_PATH=./requirements.test.txt
 
 
 SERVICE_NAME=thumbnails-service
-FUNCTION_NAME=generate_thumbnails
+
+GENERATE_THUMBNAILS_FUNCTION_NAME=generate_thumbnails
+GENERATE_THUMBNAILS_FUNCTION_FULL_NAME=${SERVICE_NAME}-local-${GENERATE_THUMBNAILS_FUNCTION_NAME}
+
+RETRY_FROM_DLQ_FUNCTION_NAME=retry_from_dlq
+RETRY_FROM_DLQ_FUNCTION_FULL_NAME=${SERVICE_NAME}-local-${RETRY_FROM_DLQ_FUNCTION_NAME}
+
 IMAGES_BUCKET_NAME=images-bucket
 IMAGES_DLQ_NAME=images-dlq
 
@@ -81,21 +87,37 @@ localstack_logs:
 
 deploy_local:
 	localstack stop || true
-	localstack start -d
+	DISABLE_EVENTS=1 localstack start -d
 	sls deploy --stage local
 
 
-deploy_function_local:
-	sls deploy function --stage local --function ${FUNCTION_NAME}
+deploy_functions_local: deploy_generate_thumbnails_function_local deploy_retry_from_dlq_function_local
 
 
-tail_function_logs:
-	${AWS_CLI} logs tail /aws/lambda/${SERVICE_NAME}-local-${FUNCTION_NAME} --follow
+deploy_generate_thumbnails_function_local:
+	sls deploy function --stage local --function ${GENERATE_THUMBNAILS_FUNCTION_NAME}
+
+
+deploy_retry_from_dlq_function_local:
+	sls deploy function --stage local --function ${RETRY_FROM_DLQ_FUNCTION_NAME}
+
+
+tail_generate_thumbnails_function_logs:
+	${AWS_CLI} logs tail /aws/lambda/${GENERATE_THUMBNAILS_FUNCTION_FULL_NAME} --follow
+
+
+tail_retry_from_sqs_function_logs:
+	${AWS_CLI} logs tail /aws/lambda/${RETRY_FROM_DLQ_FUNCTION_FULL_NAME} --follow
 
 
 upload_test_images_to_s3:
 	${AWS_CLI} s3 cp ${TEST_IMAGES_FOLDER} s3://${IMAGES_BUCKET_NAME}/images/ --recursive
 
 
-messages_in_dlq:
+show_messages_in_dlq:
 	${AWS_CLI} sqs receive-message --queue-url ${IMAGES_DLQ_URL} --max-number-of-messages 10 --output json
+
+
+retry_from_dql:
+	${AWS_CLI} lambda invoke --function-name ${RETRY_FROM_DLQ_FUNCTION_FULL_NAME} --invocation-type Event response.json	
+	rm response.json
