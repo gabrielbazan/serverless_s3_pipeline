@@ -28,17 +28,9 @@ It also includes:
 2. The image creation event is queued into an SQS queue
 3. The lambda function tries to generate the thumbnails
 4. 
-    a. Success: Thumbnails are saved to the thumbnails bucket
-    b. Error: 
-        i. An error occurs while trying to generate the thumbnails
-        ii. The message is retried as many times as configured in the queue
-        iii. If it continues to fail, the message is sent to a DLQ
-        iv. You can manually invoke another lambda function that dequeues from the DLQ and sends the messages back to the original queue to be retried
-
-
-Or:
-
-1. An error occurs while trying to generate the thumbnails
-2. The message is retried as many times as configured in the queue
-3. If it continues to fail, the message is sent to a DLQ
-4. You can manually invoke another lambda function that dequeues from the DLQ and sends the messages back to the original queue to be retried
+    * **Success**: Thumbnails are saved to the thumbnails bucket
+    * **Error**: 
+        1. An error occurs while trying to generate the thumbnails
+        2. The message is retried as many times as configured in the queue
+        3. If it continues to fail, the message is sent to a DLQ
+        4. You can manually invoke another lambda function that dequeues from the DLQ and sends the messages back to the original queue to be retried
