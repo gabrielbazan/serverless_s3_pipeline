@@ -66,7 +66,7 @@ install_test_requirements:
 	@echo "Done!"
 
 
-install_all_requirements: install_requirements install_test_requirements
+install_all_requirements: install_requirements install_dev_requirements install_test_requirements
 
 
 run_unit_tests:
