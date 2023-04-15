@@ -49,7 +49,6 @@ provider:
     IMAGES_DLQ_URL: { Ref: ImagesDLQ }
 
 
-# TODO: Per-function requirements
 functions:
   generate_thumbnails:
     handler: functions/generate_thumbnails.handler
