@@ -30,7 +30,6 @@ It also includes:
 4. 
     * **Success**: Thumbnails are saved to the thumbnails bucket
     * **Error**: 
-        1. An error occurs while trying to generate the thumbnails
-        2. The message is retried as many times as configured in the queue
-        3. If it continues to fail, the message is sent to a DLQ
-        4. You can manually invoke another lambda function that dequeues from the DLQ and sends the messages back to the original queue to be retried
+        1. The message is retried as many times as configured in the queue
+        2. If it continues to fail, the message is sent to a DLQ
+        3. You can manually invoke another lambda function that dequeues from the DLQ and sends the messages back to the original queue to be retried
