@@ -28,25 +28,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
 
 def get_files_from_event(event: Dict[str, Any]) -> List[RemoteFile]:
-    remote_files = []
-
-    for record in event["Records"]:
-        message_id = record["messageId"]
-
-        body = record["body"]
-        body_json = json.loads(body)
-
-        body_records = body_json["Records"]
-
-        for body_record in body_records:
-            s3 = body_record["s3"]
-
-            bucket_name = s3["bucket"]["name"]
-            file_path = s3["object"]["key"]
-
-            remote_files.append(RemoteFile(bucket_name, file_path, message_id))
-
-    return remote_files
+    return [
+        RemoteFile(
+            body_record["s3"]["bucket"]["name"],
+            body_record["s3"]["object"]["key"],
+            record["messageId"],
+        )
+        for record in event["Records"]
+        for body_record in json.loads(record["body"])["Records"]
+    ]
 
 
 def process_files(remote_files: List[RemoteFile]) -> List[RemoteFile]:
