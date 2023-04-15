@@ -1,0 +1,75 @@
+<mxfile host="app.diagrams.net" modified="2023-04-15T15:17:37.888Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36" etag="TQ-rZEmpw5AzqkZW509p" version="21.1.8" type="device">
+  <diagram name="Page-1" id="GexLEBE08smjbQZGGeA_">
+    <mxGraphModel dx="1433" dy="801" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Pt7g2n_0Hj9ZJkWGKrAv-5" target="Pt7g2n_0Hj9ZJkWGKrAv-28">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="720" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=3;" edge="1" parent="1" source="Pt7g2n_0Hj9ZJkWGKrAv-5" target="Pt7g2n_0Hj9ZJkWGKrAv-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-5" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://spiraldatagroup.com.au/wp-content/uploads/2019/04/aws-lambda-logo-png-transparent.png;" vertex="1" parent="1">
+          <mxGeometry x="500" y="200" width="132" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=3;" edge="1" parent="1" source="Pt7g2n_0Hj9ZJkWGKrAv-6" target="Pt7g2n_0Hj9ZJkWGKrAv-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-6" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://static-00.iconduck.com/assets.00/storage-amazons3-bucket-icon-495x512-rd519ixy.png;" vertex="1" parent="1">
+          <mxGeometry x="24.69" y="200" width="154.69" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=3;" edge="1" parent="1" source="Pt7g2n_0Hj9ZJkWGKrAv-7" target="Pt7g2n_0Hj9ZJkWGKrAv-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-7" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://static-00.iconduck.com/assets.00/aws-sqs-simple-queue-service-icon-424x512-lkqfmttm.png;" vertex="1" parent="1">
+          <mxGeometry x="277" y="200" width="132.5" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=3;" edge="1" parent="1" source="Pt7g2n_0Hj9ZJkWGKrAv-12" target="Pt7g2n_0Hj9ZJkWGKrAv-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-12" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://static-00.iconduck.com/assets.00/aws-sqs-simple-queue-service-icon-424x512-lkqfmttm.png;" vertex="1" parent="1">
+          <mxGeometry x="500" y="440" width="132.5" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-16" value="Images bucket" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="24.69" y="170" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-17" value="Thumbnails bucket" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="714.69" y="170" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-18" value="images_queue" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="254" y="170" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-19" value="generate_thumbnails" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="472.5" y="170" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-20" value="Dead Letter Queue" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="486.25" y="600" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeWidth=3;" edge="1" parent="1" source="Pt7g2n_0Hj9ZJkWGKrAv-21" target="Pt7g2n_0Hj9ZJkWGKrAv-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-21" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://spiraldatagroup.com.au/wp-content/uploads/2019/04/aws-lambda-logo-png-transparent.png;" vertex="1" parent="1">
+          <mxGeometry x="277.5" y="440" width="132" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-23" value="retry_from_DLQ" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="263.25" y="600" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-25" value="image created" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="179.38" y="250" width="79.31" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-26" value="success" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="640" y="255" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-27" value="error" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="560" y="380" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pt7g2n_0Hj9ZJkWGKrAv-28" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://o.remove.bg/downloads/a27fc043-83a4-4930-83ad-becd3167a7b6/blue-bucket-white-background-removebg-preview.png;" vertex="1" parent="1">
+          <mxGeometry x="720" y="200" width="154.69" height="160.05" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

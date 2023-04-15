@@ -1,0 +1,157 @@
+service: thumbnails-service
+
+
+plugins:
+  - serverless-localstack
+  - serverless-python-requirements
+
+
+custom:
+  localstack:
+    stages:
+      - local
+    debug: false
+
+  pythonRequirements:
+    dockerizePip: false
+    useDownloadCache: true
+    useStaticCache: true
+    slim: true
+
+
+package:
+  individually: true
+  patterns:
+    - "!test"
+    - "!functions/__pycache__"
+    - "!node_modules"
+    - "!venv"
+    - "!.mypy_cache"
+    - "!.idea"
+    - "!.vscode"
+    - "!.pre-commit-config.yaml"
+    - "!package-lock.json"
+    - "!tox.ini"
+    - "!Makefile"
+
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: us-east-1
+
+  environment:
+    IMAGES_BUCKET_NAME: images-bucket
+    THUMBNAILS_BUCKET_NAME: thumbnails-bucket
+    IMAGES_QUEUE_NAME: images-queue
+    IMAGES_QUEUE_URL: { Ref: ImagesQueue }
+    IMAGES_DLQ_NAME: images-dlq
+    IMAGES_DLQ_URL: { Ref: ImagesDLQ }
+
+
+functions:
+  generate_thumbnails:
+    handler: functions/generate_thumbnails.handler
+    events:
+      - sqs:
+          arn: !GetAtt ImagesQueue.Arn
+          batchSize: 10
+          functionResponseType: ReportBatchItemFailures
+  
+  retry_from_dlq:
+    handler: functions/retry_from_dlq.handler
+    timeout: 300
+
+
+resources:
+  Resources:
+    ImagesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.IMAGES_BUCKET_NAME}
+        NotificationConfiguration:
+          QueueConfigurations:
+            - Event: 's3:ObjectCreated:Put'
+              Filter:
+                S3Key:
+                  Rules:
+                    - Name: suffix
+                      Value: .png
+              Queue: !GetAtt ImagesQueue.Arn
+            - Event: 's3:ObjectCreated:Put'
+              Filter:
+                S3Key:
+                  Rules:
+                    - Name: suffix
+                      Value: .jpg
+              Queue: !GetAtt ImagesQueue.Arn
+
+    ImagesQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:provider.environment.IMAGES_QUEUE_NAME}
+        RedrivePolicy:
+          deadLetterTargetArn:
+            Fn::GetAtt: [ImagesDLQ, Arn]
+          maxReceiveCount: 2
+
+    ImagesDLQ:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:provider.environment.IMAGES_DLQ_NAME}
+
+    ThumbnailsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.THUMBNAILS_BUCKET_NAME}
+
+    ImagesQueuePolicy:
+      Type: "AWS::SQS::QueuePolicy"
+      Properties:
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service: "s3.amazonaws.com"
+              Action: "sqs:SendMessage"
+              Resource:
+                Ref: "ImagesQueue"
+              Condition:
+                ArnLike:
+                  aws:SourceArn: !Sub "arn:aws:s3:::${self:provider.environment.IMAGES_BUCKET_NAME}/*"
+        Queues:
+          - !Ref ImagesQueue
+
+    GenerateThumbnailsLambdaExecutionRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+        RoleName: "GenerateThumbnailsLambdaExecutionRole"
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service: "lambda.amazonaws.com"
+              Action: "sts:AssumeRole"
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies:
+          - PolicyName: "s3Access"
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: "Allow"
+                  Action:
+                    - "s3:GetObject"
+                  Resource: 
+                    - "arn:aws:s3:::${self:provider.environment.IMAGES_BUCKET_NAME}/*"
+          - PolicyName: "s3Access"
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: "Allow"
+                  Action:
+                    - "s3:PutObject"
+                  Resource: 
+                    - "arn:aws:s3:::${self:provider.environment.THUMBNAILS_BUCKET_NAME}/*"

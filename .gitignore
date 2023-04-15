@@ -1,0 +1,7 @@
+.serverless/
+.mypy_cache/
+.vscode/
+node_modules/
+venv/
+package-lock.json
+__pycache__
