@@ -119,3 +119,86 @@ You can alternatively start localstack as a daemon and deploy with a single comm
 ```bash
 make deploy_local
 ```
+
+
+## Makefile commands
+
+### Install GIT Hooks
+
+```bash
+make install_git_hooks
+```
+
+### Run GIT Hooks
+
+```bash
+make run_git_hooks
+```
+
+### Create Python virtualenv
+
+```bash
+make create_virtualenv
+```
+
+### Install requirements into the virtualenv
+
+```bash
+make install_requirements
+make install_dev_requirements
+make install_test_requirements
+
+# Or just
+make install_all_requirements
+```
+
+### Run tests
+
+```bash
+make run_unit_tests
+make run_integration_tests
+```
+
+### Deploy stack to LocalStack
+
+Restarts LocalStack (if running) before deploying.
+
+```bash
+make deploy_local
+```
+
+### Deploy only the Lambda functions to LocalStack
+
+```bash
+make deploy_functions_local
+```
+
+### Show logs of the Lambda function that generates the thumbnails
+
+```bash
+make tail_generate_thumbnails_function_logs
+```
+
+### Show logs of the Lambda function that enqueues failed messages to retry
+
+```bash
+make tail_retry_from_sqs_function_logs
+```
+
+### Upload a few test images to the input bucket
+
+```bash
+make upload_test_images_to_s3
+```
+
+### Show up to 10 messages in the DLQ
+
+```bash
+make show_messages_in_dlq
+```
+
+### Invoke the Lambda function that enqueues failed messages to retry
+
+```bash
+make retry_from_dql
+```
