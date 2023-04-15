@@ -22,6 +22,8 @@ It also includes:
 
 ## Design
 
-<p align="center">
+<!-- <p align="center">
   <img alt="Design" src="https://raw.githubusercontent.com/gabrielbazan/serverless_s3_pipeline/develop/docs/diagram.png">
-</p>
+</p> -->
+
+![Design](docs/diagram.png?raw=true "Design")
