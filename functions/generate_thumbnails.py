@@ -109,18 +109,15 @@ def generate_thumbnail(
     local_file_path: str,
 ) -> str:
     file_name = basename(local_file_path)
-    local_folder_path = dirname(local_file_path)
-
-    thumbnail_image = image.copy()
-
-    thumbnail_image.thumbnail(size)
-
     _, extension = splitext(file_name)
     width, height = size
     thumbnail_filename = f"{width}x{height}{extension}"
 
+    local_folder_path = dirname(local_file_path)
     thumbnail_path = join(local_folder_path, thumbnail_filename)
 
+    thumbnail_image = image.copy()
+    thumbnail_image.thumbnail(size)
     thumbnail_image.save(thumbnail_path)
 
     return thumbnail_path
