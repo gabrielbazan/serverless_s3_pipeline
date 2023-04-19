@@ -66,7 +66,7 @@ def try_to_process_file(
         process_file(remote_file)
         logging.info("Successfully processed %s", remote_file)
     except Exception:
-        logging.error("Failed to process %s", remote_file)
+        logging.exception("Failed to process %s", remote_file)
         failed_files.append(remote_file)
 
 
