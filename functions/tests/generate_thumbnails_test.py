@@ -47,6 +47,22 @@ EVENT_MOCK = {
 }
 
 
+TMP_FOLDER_PATH = "/tmp/folder/path"
+
+LOCAL_FILE_PATH = os.path.join(TMP_FOLDER_PATH, FILENAME)
+
+
+def build_thumbnail_filename(width: int, height: int) -> str:
+    return f"{width}x{height}{EXTENSION}"
+
+
+def build_local_thumbnail_path(width: int, height: int) -> str:
+    return os.path.join(
+        TMP_FOLDER_PATH,
+        build_thumbnail_filename(width, height),
+    )
+
+
 class GenerateThumbnailsTestCase(TestCase):
     @patch(f"{MODULE}.logging", MagicMock())
     @patch(f"{MODULE}.upload_file_to_s3_bucket")
@@ -64,11 +80,8 @@ class GenerateThumbnailsTestCase(TestCase):
     ) -> None:
         # Given
         temporary_directory = MagicMock()
-        tmp_folder_path = "/tmp/folder/path"
-        temporary_directory.__enter__.return_value = tmp_folder_path
+        temporary_directory.__enter__.return_value = TMP_FOLDER_PATH
         TemporaryDirectory.return_value = temporary_directory
-
-        local_file_path = os.path.join(tmp_folder_path, FILENAME)
 
         image = MagicMock()
         Image.open.return_value = image
@@ -88,16 +101,16 @@ class GenerateThumbnailsTestCase(TestCase):
         download_file_from_s3_bucket.assert_called_once_with(
             BUCKET_NAME,
             OBJECT_KEY,
-            local_file_path,
+            LOCAL_FILE_PATH,
         )
 
-        Image.open.assert_called_once_with(local_file_path)
+        Image.open.assert_called_once_with(LOCAL_FILE_PATH)
 
         self.assertEqual(image.copy.call_count, 3)
         image.thumbnail.assert_has_calls([call(size) for size in THUMBNAIL_SIZES])
         image.save.assert_has_calls(
             [
-                call(os.path.join(tmp_folder_path, f"{width}x{height}{EXTENSION}"))
+                call(build_local_thumbnail_path(width, height))
                 for width, height in THUMBNAIL_SIZES
             ]
         )
@@ -109,14 +122,12 @@ class GenerateThumbnailsTestCase(TestCase):
         upload_file_to_s3_bucket.assert_has_calls(
             [
                 call(
-                    # TODO: Duplicated
-                    os.path.join(tmp_folder_path, f"{width}x{height}{EXTENSION}"),
+                    build_local_thumbnail_path(width, height),
                     thumbnails_bucket_name,
                     os.path.join(
                         THUMBNAILS_BUCKET_FOLDER_PATH,
                         THUMBNAILS_BUCKET_FILE_FOLDER_NAME_TEMPLATE.format(FILENAME),
-                        # TODO: Duplicated
-                        f"{width}x{height}{EXTENSION}",
+                        build_thumbnail_filename(width, height),
                     ),
                 )
                 for width, height in THUMBNAIL_SIZES
