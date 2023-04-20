@@ -75,6 +75,12 @@ run_unit_tests:
 	@echo "Done!"
 
 
+coverage:
+	@echo "Generating code coverage report..."
+	@. ${VIRTUALENV_PATH}/bin/activate && coverage run -m unittest discover -s functions -p '*_test.py' && coverage report -m && coverage html
+	@echo "Done!"
+
+
 run_integration_tests:
 	@echo "Running integration tests..."
 	@. ${VIRTUALENV_PATH}/bin/activate && python -m unittest discover -s integration_tests -p '*_test.py'
