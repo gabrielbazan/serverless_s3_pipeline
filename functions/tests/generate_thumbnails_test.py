@@ -134,5 +134,28 @@ class GenerateThumbnailsTestCase(TestCase):
             ]
         )
 
-        expected_response: Dict[str, List[str]] = {"batchItemFailures": []}
+        expected_response: Dict[str, List[Dict[str, str]]] = {"batchItemFailures": []}
+        self.assertEqual(response, expected_response)
+
+    @patch(f"{MODULE}.logging", MagicMock())
+    @patch(f"{MODULE}.TemporaryDirectory")
+    def test_handler_failure(self, TemporaryDirectory: MagicMock) -> None:
+        # Given
+        TemporaryDirectory.side_effect = Exception("Something went wrong")
+
+        context = Mock()
+
+        # When
+        response = handler(EVENT_MOCK, context)
+
+        # Then
+        TemporaryDirectory.assert_called_once_with()
+
+        expected_response: Dict[str, List[Dict[str, str]]] = {
+            "batchItemFailures": [
+                {
+                    "itemIdentifier": MESSAGE_ID,
+                }
+            ]
+        }
         self.assertEqual(response, expected_response)
